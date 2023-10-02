@@ -180,6 +180,24 @@ obj = $(patsubst %.c ,%.o ,$(src))
 ob = $(patsubst ./src/%.c, ./obj/%.o, $(src))
 ```
 
-**10\. 小结**
+**10\. -I静态库依赖**
 
-Makefile其实提供了非常非常多的功能，但本文所写的对于一般的企业应用完全够用了。特别对于初学者，学习一些基础知识（如本文），再辅一些案例（如本系列的几个案例），完全可以达到企业用人标准了。正所谓要抓住事物的主要矛盾，可以先把基础知识吃透再去延伸Makefile的其它知识。
+静态库依赖可在Makefile中使用-I统一给出，
+
+```bash
+# 预处理参数
+CPPLFAGS=-I./include					\
+		 -I/usr/include/fastdfs			\
+		 -I/usr/include/fastcommon		\
+		 -I/usr/local/include/hiredis/  \
+		 -I/usr/include/mysql/   \
+		-I/home/yuan/packages/fcgi-2.4.1-SNAP-0910052249/ \
+		-I/home/yuan/packages/fcgi-2.4.1-SNAP-0910052249/include/
+
+```
+
+1. 格式
+    1. -I 头文件所在路径 \ 
+2. 当编译缺少该依赖时操作步骤
+    1. 首先找到缺失头文件的位置：sudo find / -name “头文件名字”
+    2. 将该头文件所在文件夹路径加入编译依赖路径

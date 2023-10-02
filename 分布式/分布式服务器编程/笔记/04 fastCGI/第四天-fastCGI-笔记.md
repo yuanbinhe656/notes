@@ -22,18 +22,34 @@
    	- /login: 服务器端要处理的指令
    	- ? : 连接符, 后边的内容是客户端给服务器提交的数据
    	- & : 分隔符
+   	- = ：key = value
    动态的url如何找服务器端处理的指令?
    - 去掉协议
    - 去掉域名/IP
    - 去掉端口
    - 去掉?和它后边的内容
-   # 如果看到的是请求行, 如何找处理指令?
-   POST /upload/UploadAction HTTP/1.1
-   GET /?username=tom&phone=123&email=hello%40qq.com&date=2018-01-01&sex=male&class=3&rule=on HTTP/1.1
-   1. 找请求行的第二部分
-   	- 如果是post, 处理指令就是请求行的第二部分
-   	- 如果是get, 处理指令就是请求行的第二部分, ? 以前的内容
+   
+   
    ```
+
+寻找界面业务逻辑方法
+
+1. 直接查看html界面文件
+
+2. 查看nginx中logs中的错误日志
+
+    1. ```
+         如果看到的是请求行, 如何找处理指令?
+            
+        POST /upload/UploadAction HTTP/1.1
+        GET /?username=tom&phone=123&email=hello%40qq.com&date=2018-01-01&sex=male&class=3&rule=on HTTP/1.1
+        
+        1.找请求行的第二部分
+            - 如果是post, 处理指令就是请求行的第二部分
+            - 如果是get, 处理指令就是请求行的第二部分, ? 以前的内容
+        ```
+
+        
 
 ## 2. http协议复习
 
@@ -176,7 +192,9 @@
 
 **fastCGI与CGI的区别:**
 
-> CGI 就是所谓的短生存期应用程序，FastCGI 就是所谓的长生存期应用程序。FastCGI像是一个常驻(long-live)型的CGI，它可以一直执行着，不会每次都要花费时间去fork一次
+> CGI 就是所谓的短生存期应用程序，FastCGI 就是所谓的长生存期应用程序。FastCGI像是一个常驻(long-live)型的CGI，它可以一直执行着，不会每次都要花费时间去fork一次，相当于基于事件的模型
+>
+> 其主要在业务服务器中使用（代理服务器转交给业务服务器之后）
 
 ![clip_image006](191104485636450.png) 
 
@@ -185,21 +203,29 @@
 >1. 用户通过浏览器访问服务器, 发送了一个请求, 请求的url如上
 >2. 服务器接收数据, 对接收的数据进行解析
 >3. nginx对于一些登录数据不知道如何处理, nginx将数据发送给了fastcgi程序
->   - 通过本地套接字
->   - 网络通信的方式
+>  - 通过本地套接字
+>  - 网络通信的方式
 >4. fastCGI程序如何启动
->   - 不是有web服务器直接启动
->   - 通过一个fastCGI进程管理器启动
+>  - 不是有web服务器直接启动
+>  - 通过一个fastCGI进程管理器启动
 >5. fastcgi启动
->   - 加载配置 - 可选
->   - 连接服务器 - 数据库
->   - 循环
->     - 服务器有请求 -> 处理
->       - 将处理结果发送给服务器
->         - 本地套接字
->         - 网络通信
->     - 没有请求 -> 阻塞
+>  - 加载配置 - 可选
+>  - 连接服务器 - 数据库
+>  - 循环
+>    - 服务器有请求 -> 处理
+>      - 将处理结果发送给服务器
+>        - 本地套接字
+>        - 网络通信
+>    - 没有请求 -> 阻塞
 >6. 服务器将fastCGI的处理结果发送给客户端
+>7. 对程序员可见的流程
+>    1. 客户端经浏览器进行包装请求
+>    2. 请求发送到服务端
+>    3. 服务端对请求进行解析（nginx）
+>    4. 服务端对请求进行分发给CGI
+>    5. CGI接受请求
+>    6. CGI解析请求 ==程序员只能看到解析后的请求==
+>    7. 
 
 ### 3.3 fastCGI和spawn-fcgi安装
 
@@ -215,7 +241,7 @@
    sudo make install
    ```
 
-2. 安装spawn-fcgi
+2. 安装spawn-fcgi  fastcgi的进程管理器，由管理人员启动
    - 下载地址: <http://redmine.lighttpd.net/projects/spawn-fcgi/wiki> 
 
    - 安装
@@ -233,6 +259,10 @@
 > 通过前面的介绍知道，fastcgi进程由FastCGI进程管理器管理，而不是nginx。这样就需要一个FastCGI管理，管理我们编写fastcgi程序。我们使用spawn-fcgi作为FastCGI进程管理器。 
 >
 > spawn-fcgi是一个通用的FastCGI进程管理器，简单小巧，原先是属于lighttpd的一部分，后来由于使用比较广泛，所以就迁移出来作为独立项目了。spawn-fcgi使用pre-fork 模型，==功能主要是打开监听端口，绑定地址，然后fork-and-exec创建我们编写的fastcgi应用程序进程，退出完成工作==。fastcgi应用程序初始化，然后进入死循环侦听socket的连接请求。
+>
+> 端口地址供子程序使用，通过spawn-fcgi配置文件进行修改便可直接修改地址和端口，不需要修改源代码
+>
+> spawn-fcgi充当nginx和处理请求程序之间的中间件，主要是转发请求和转发回复
 
 ![](1.png)
 
@@ -240,12 +270,15 @@
 >
 > 1. 客户端访问, 发送请求
 > 2. nginx web服务器, 无法处理用户提交的数据
-> 3. spawn-fcgi - 通信过程中的服务器角色
+>     1. 主动将数据发送给spwan-fcgi
+>     2. 连接到spwan-fcgi端口
+> 3. spawn-fcgi - 通信过程中的服务器角色，回发的时候角色交换
 >    - 被动接收数据
 >    - 在spawn-fcgi启动的时候给其绑定IP和端口
 > 4. fastCGI程序 
 >    - 程序猿写的 -> login.c -> 可执行程序( login )
->    - 使用 spawn-fcgi 进程管理器启动 login 程序, 得到一进程
+>        - 进行实际的业务流程操作
+>    - 使用 spawn-fcgi 进程管理器启动 login 程序, 得到一进程，==两者之间是父子关系==
 
 1. nginx的数据转发 - 需要修改nginx的配置文件 nginx.conf
 
@@ -265,9 +298,9 @@
        include fastcgi.conf;
    }
    地址信息: 
-   	- localhost
+   	- localhost   #一般部署在同一台电脑，本机效率较高
    	- 127.0.0.1
-   	- 192.168.1.100
+   	- 192.168.1.100  #实际ip地址
    端口: 找一个空闲的没有被占用的端口即可
    ```
 
@@ -282,9 +315,14 @@
    	- nginx: 192.168.1.100   ->    IP: 192.168.1.100
    - 端口:
    	应该和nginx的 fastcgi_pass 中的端口一致
+   	每一个不同的请求对应一个fastcgi可执行程序，通过端口进行映射
    ```
 
 3. fastCGI程序怎么写
+
+   1. spawan已经将fastcgi中的标准输入和输出进行了重定向
+      1. 应该fd文件描述符有两个缓冲区，由内核维护，缓冲区有数据就进行操作
+
 
    ```c
    // http://localhost/login?user=zhang3&passwd=123456&age=12&sex=man
@@ -300,11 +338,13 @@
            // 1. 接收数据
            // 1.1 get方式提交数据 - 数据在请求行的第二部分
            // user=zhang3&passwd=123456&age=12&sex=man
-           char *text = getenv("QUERY_STRING"); 
+           char *text = getenv("QUERY_STRING"); //环境变量，请求串，不包括地址，截断后的串
            // 1.2 post方式提交数据
            char *contentLength = getenv("CONTENT_LENGTH");
            // 根据长度大小判断是否需要循环
            // 2. 按照业务流程进行处理
+           // 2.1 上传
+           // 2.2 下载
            // 3. 将处理结果发送给nginx
            // 数据回发的时候, 需要告诉nginx处理结果的格式 - 假设是html格式
            printf("Content-type: text/html\r\n");
@@ -316,6 +356,7 @@
    ![1539853347025](assets/1539853347025.png)
 
    ![1539853472802](assets/1539853472802.png)
+
 
 ##复习
 
@@ -456,7 +497,7 @@ Nginx
       # 请求头
       Content-Type: application/x-www-form-urlencoded;charset=utf-8
       # 空行
-      # 请求数据(向服务器提交的数据)
+      # 请求数据(向服务器提交的数据) 用&进行键值对的间隔
       title=test&user=kevin&passwd=32222
       ```
 
@@ -480,19 +521,19 @@ Nginx
           	<value><i4>41</i4></value>
           </params>
       </methodcall>
-      
+      # 标签是未定义的
       <font color="red">nihao, shijie</font>
       ```
 
-    - multipart/form-data
+    - multipart/form-data   可以传输多个数据块
 
       ```http
       POST / HTTP/1.1
       Content-Type: multipart/form-data
       # 发送的数据
-      ------WebKitFormBoundaryPpL3BfPQ4cHShsBz \r\n
-      Content-Disposition: form-data; name="file"; filename="qw.png"
-      Content-Type: image/png\r\n; md5="xxxxxxxxxx"
+      ------WebKitFormBoundaryPpL3BfPQ4cHShsBz \r\n  #分界线，随机生成，前后一样
+      Content-Disposition: form-data; name="file"; filename="qw.png"   #对文件属性的描述
+      Content-Type: image/png\r\n; md5="xxxxxxxxxx"                    #对文件内容格式的描述
       \r\n
       .............文件内容................
       .............文件内容................
@@ -504,6 +545,8 @@ Nginx
       .............文件内容................
       ------WebKitFormBoundaryPpL3BfPQ4cHShsBz--
       ```
+
+    - Content-Type:根据文件名后缀来对应的名称，通过查表进行查得，网站：[在线工具 —— OSCHINA.NET社区](https://tool.oschina.net/)
 
 3. strtol 函数使用
 
@@ -511,7 +554,7 @@ Nginx
     // 将数字类型的字符串 -> 整形数
     long int strtol(const char *nptr, char **endptr, int base);
     	- 参数nptr: 要转换的字符串 - 数字类型的字符串: "123", "0x12", "0776"
-    	- 参数endptr: 测试时候使用, 一般指定为NULL
+    	- 参数endptr: 测试时候使用, 一般指定为NULL，传回转换出错位置的指针
     	- 参数base: 进制的指定
     		- 10 , nptr = "123456", 如果是"0x12"就会出错
             - 8  , nptr = "0345"
@@ -523,6 +566,17 @@ Nginx
      - 打印pt的值: "abc"
     ```
 
-         
+4.  fread函数使用
+
+    ```
+           size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+    
+           size_t fwrite(const void *ptr, size_t size, size_t nmemb,
+                         FILE *stream);
+    
+    fread(buf,1,size,stdin); 第一个读入的缓冲区地址，第二个参数一个长度站多少个字符，第三个长度，第四个输入输出文件
+    ```
+
+    
 
 http://tool.oschina.net/

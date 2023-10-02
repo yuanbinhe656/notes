@@ -13,7 +13,7 @@
    - 举例:
      - mysql
      - oracle
-     - sqlite - 文件数据库
+     - sqlite - 文件数据库，也可以在嵌入式设备写入配置文件，通过数据库进行查找
      - sql server
 2. 非关系数据库 - nosql
    - 操作不使用sql语句
@@ -36,6 +36,7 @@
 >      - 将数据写入到redis中
 >    - 客户端第二次包含以后访问服务器
 >      - 服务器从redis中直接读数据
+> 3. redis和RDBMS不直接通信，其数据管理通过服务器进行管理
 
 ## 2. Redis
 
@@ -73,11 +74,11 @@
    # 客户端
    redis-cli	# 默认连接本地, 绑定了6379默认端口的服务器
    redis-cli -p 端口号
-   redis-cli -h IP地址 -p 端口 # 连接远程主机的指定端口的redis
+   redis-cli -h IP地址 -p 端口 # 连接远程主机的指定端口的redis，需要进行配置，默认连不上
    # 通过客户端关闭服务器
    shutdown
    # 客户端的测试命令
-   ping [MSG]
+   ping [MSG]  可加可不加，返回该消息
    ```
 
 4. redis中数据的组织格式
@@ -105,12 +106,23 @@
    - SortedSet类型
      - 排序集合, 集合中的每个元素分为两部分
        - [分数, 成员] -> [66, ''tom'']
+       - 按第一个成员进行排序，默认是数字
    - Hash类型
      - 跟map数据组织方式一样: key:value
        - Qt -> QHash, QMap
        - Map -> 红黑树
        - hash -> 数组
          - a[index] = xx
+         - 查询最快，直接进行映射，O（1）
+
+
+
+redis中心思想
+
+1. 只有一种具体类型，string
+2. 通过容器将string进行存储，每个容器通过一个string进行查找
+3. 容器对应的key相当于该变量的名称
+4. 不同类型的容器不能相互转化
 
 ### 2.2 redis常用命令
 
@@ -185,7 +197,7 @@
   # 添加元素
   ZADD key score member [[score member] [score member] ...]
   # 遍历
-  ZRANGE key start stop [WITHSCORES] # -> 升序集合
+  ZRANGE key start stop [WITHSCORES] # -> 升序集合 若范围为-1 -1，显示最后一个元素，-1代表最后一个元素
   ZREVRANGE key start stop [WITHSCORES] # -> 降序集合
   # 指定分数区间内元素的个数
   ZCOUNT key min max
@@ -237,7 +249,7 @@
 
 1. 配置文件位置
 
-   - 从源码安装目录中找 -> redis.conf
+   - 从==源码安装目录==中找 -> redis.conf
 
 2. 配置文件配置项
 
@@ -249,7 +261,7 @@
    protected-mode yes
    # reids服务器启动时候绑定的端口, 默认为6379
    port 6379
-   # 超时时长, 0位关闭该选项, >0则开启
+   # 超时时长, 0位关闭该选项, >0则开启，超狗多长时间没客户端连接自动关闭
    timeout 0
    # 服务器启动之后不是守护进程
    daemonize no
@@ -258,6 +270,10 @@
    pidfile ./redis.pid
    # 日志级别
     loglevel notice
+    # debug  调试 最多
+    # verbose 有用信息
+    # notice 想要信息，关注
+    # warning 错误，非常重要
    # 如果服务器是守护进程, 才会写日志文件
     logfile "" -> 这是没写
     logfile ./redis.log
@@ -265,6 +281,8 @@
     databases 16 
     	- 切换 select dbID [dbID == 0 ~ 16-1]
    ```
+
+在redis的执行目录中默认生成一个dump.rdb ，持久化数据，将内存中的数据保存到磁盘
 
 ### 2.4 redis数据持久化
 
@@ -281,10 +299,13 @@
   - 数据完整性相对较低
 - aof方式
   - 默认是关闭的
-  - 磁盘的持久化文件xxx.aof
-  - 直接将生成数据的命令写入磁盘文件
+  - 磁盘的持久化文件xxx.aof   只改后缀，不改名字
+  - 直接将生成数据的命令写入磁盘文件  相当于数据的操作日志 越存越多
   - 文件比较大, 恢复时间长, 效率低
-  - 以某种频率 -> 1sec
+  - 以某种频率 -> 1sec  同步频率高  可以
+      - no 缓存满后，系统强制刷新缓存
+      - always ：每次操作均刷新
+      - eversec：每秒进行刷新
   - 数据完整性高
 
 ```shell
@@ -319,6 +340,7 @@ appendfsync everysec
 
      ```shell
      save ""
+     
      ```
 
 3. 两种模式同时开启, 如果要进行数据恢复, 如何选择?
@@ -359,11 +381,11 @@ appendfsync everysec
          long long integer;
          /* str变量的字符串值长度 */
          size_t len;
-         /* 存储命令执行结果返回是字符串, 或者错误信息 */
+         /* 存储命令执行结果返回是字符串,返回值， 或者错误信息 */
          char *str;
          /* 返回结果是数组, 代表数据的大小 */
          size_t elements;
-         /* 存储执行结果返回是数组*/
+         /* 存储执行结果返回是 本结构类型 数组*/
          struct redisReply **element;
      } redisReply;
      redisReply a[100];
@@ -379,8 +401,10 @@ appendfsync everysec
      | REDIS_REPLY_STATUS ==5   | 返回命令执行的状态，比如set foo bar 返回的状态为OK，存储在str当中 reply->str == "OK" 。 |
      | REDIS_REPLY_ERROR ==6    | 命令执行错误,错误信息存放在 reply->str当中。                 |
 
-   - 释放资源
+     不同的状态从不同的空间中
 
+   - 释放资源
+   
      ```c
      // 释放资源
      void freeReplyObject(void *reply);
@@ -414,15 +438,15 @@ appendfsync everysec
 
 
      客户端编写
-
+    
      ![1531272014374](1531272014374.png)
-
+    
      - 操作步骤
-
+    
        1. 创建管道 - pipe
        2. 创建子进程
        3. 子进程干什么?
-
+    
           - 写管道, 关闭读端
             - 将标准输出 -> 管道的写端
           - 重定向

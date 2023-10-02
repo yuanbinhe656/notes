@@ -3,6 +3,10 @@
 1. 文件上传流程
 
    ![1535275371466](1535275371466.png)
+   
+   数据库存储的一般是文件md5与对应在fastDFS中的存储编号
+   
+   文件先保存到服务器上，服务器通过与fastDFS通信，再将文件保存到文件数据库上，最后服务器将返回的文件ID保存到数据库中，同时服务器删除本地存储的文件
 
 
 
@@ -16,13 +20,19 @@
    >
    > - - 直接让客户端连接fastDFS的存储节点, 实现文件下载
    >
-   >   - 举例, 访问一个url直接下载:
+   >       - 客户端先询问服务器文件对应存储节点的ip：port，以及文件编码
    >
+   >       - 客户端再与存储节点进行访问
+   >   
+   >       - 相当于给存储节点一个解析http请求的功能，因此可以在存储节点上使用nginx作为请求功能的解析使用
+   >   
+   >   - 举例, 访问一个url直接下载:
+   >   
    >     <http://192.168.247.147/group1/M00/00/00/wKj3k1tMBKuARhwBAAvea_OGt2M471.jpg> 
    >
-
+   
    ![1535275468424](1535275468424.png)
-
+   
    > 1. 客户端发送请求使用的协议: http
    >
    > 2. - fastDFS能不能解析http协议
@@ -30,12 +40,16 @@
    >    - nginx能解析http协议
    >
    >    - - 在nginx中安装fastDFS的插件
+   >        - 使nginx与fastDFS进行通信
+   >        - 相当于在nginx上启动一个进程，该进程与fastDFS进行通信
    >
    > 3. 客户端怎么知道文件就存储在对应的那个存储节点上?
    >
    > 4. - 上传的时候将fileID和存储节点IP地址都进行存储
 
 ## 2. Nginx和fastDFS的整合
+
+==启动nginx之前需要先启动fastDFS==
 
 1. 在存储节点上安装Nginx, 将软件安装包拷贝到fastDFS存储节点对应的主机上
 
@@ -61,13 +75,13 @@
    ```shell
    # 1. fatal error: fdfs_define.h: No such file or directory
    # 2. fatal error: common_define.h: No such file or directory
-   
-   default:    build
+   # default 最终形成的文件，build default编译依赖的文件，按树状图从上往下查找
+   default:    build   
    
    clean:
        rm -rf Makefile objs
    
-   build:
+   build:# 可追溯到这里 发现其依赖objs下的Makefile，则找到该文件
        $(MAKE) -f objs/Makefile
    
    install:
@@ -89,7 +103,7 @@
        -I src/event \
        -I src/event/modules \
        -I src/os/unix \
-       -I /usr/local/include/fastdfs \
+       -I /usr/local/include/fastdfs \ #可以看到是yuqing加了，但是路径没加对
        -I /usr/local/include/fastcommon/ \
        -I objs \
        -I src/http \                                                                                                      
@@ -134,7 +148,7 @@
    storage_server_port=23000
    # 当前存储节点所属的组
    group_name=group1
-   # 客户端下载文件的时候, 这个下载的url中是不是包含组的名字
+   # 客户端下载文件的时候, 这个下载的url中是不是包含组的名字（group1）
    // 上传的fileID: group1/M00/00/00/wKj3h1vJRPeAA9KEAAAIZMjR0rI076.cpp
    // 完整的url: http://192.168.1.100/group1/M00/00/00/wKj3h1vJRPeAA9KEAAAIZMjR0rI076.cpp
    url_have_group_name = true
@@ -165,6 +179,8 @@
    服务器在查找资源时候, 找的位置不对, 需要给服务器指定一个正确的位置, 如何指定?
    	- 资源在哪? 在存储节点的存储目录中 store_path0
    	- 如何告诉服务器资源在这? 在服务器端添加location处理
+   	- 其会进行模糊匹配，依次去寻找
+   
    locatioin /group1/M00/00/00/wKj3h1vJSOqAM6RHAAvqH_kipG8229.jpg
    location /group1/M00/00/00/
    location /group1/M00/
@@ -176,7 +192,12 @@
    }
    	
    ```
-
+   
+   1. locatioin /group1/M00/00/00/wKj3h1vJSOqAM6RHAAvqH_kipG8229.jpg
+       1. group1：文件所在的不同分组
+       2. M00：不同的存储路径，映射前的变量，映射后是路径，可能会变
+       3. 00/00 ：可变，具体文件目录 ==可以不用==
+   2. 当将文件返回给浏览器时，会根据文件类型选择在浏览器中打开或者下载到本地，若是图片，mp3一般在浏览器中显示，若是文件或者.c等文件一般下载到本地
 
 ## 3. 数据库表
 
@@ -238,7 +259,7 @@
    | size     | 文件大小, 以字节为单位                                       |
    | type     | 文件类型： png, zip, mp4……                                   |
    | fileName | 文件名                                                       |
-   | count    | 文件引用计数， 默认为1    每增加一个用户拥有此文件，此计数器+1 |
+   | count    | 文件引用计数， 默认为1    每增加一个用户拥有此文件，此计数器+1为0时可以删除，多个用户可以对应同一个文件 |
 
    ```mysql
    CREATE TABLE user_file_list (
@@ -307,6 +328,65 @@
    );
    ```
 
+## 4. 服务器文件结构分析
+
+1. 文件结构
+
+    1. bin_cgi  
+
+    2. common 
+
+        1. base64.c  cfg.c  cJSON.c  deal_mysql.c  des.c  make_log.c  md5.c  redis_op.c  util_cgi.c
+            base64.o  cfg.o  cJSON.o  deal_mysql.o  des.o  make_log.o  md5.o  redis_op.o  util_cgi.o
+        2. base64：进行base64编码解码
+        3. JSON：进行json对的解析
+        4. deal_mysql :进行mysql的使用
+        5. des：进行加密通信
+        6. make_log ：进行日志读写
+        7. md5：进行文件md5校验
+        8. redis_op: 将hreisd的命令改为函数
+        9. util_cgi:
+
+    3.  conf  
+
+        1. 配置文件目录
+
+    4.   include
+
+        1. 头文件
+
+    5. 脚本
+
+        1. start.sh
+            1. 进行启动
+        2. fastdfs.sh  
+        3. fcgi.sh
+            1. 进行使用
+        4. nginx.sh
+        5. redis.sh  
+
+    6. 配置文件
+
+        1. nginx.conf  
+            1. nginx的配置文件，运行时需要将该文件拷贝到nginx默认配置文件目录，将之前的改为old
+
+    7.   logs 
+
+        1. 日志文件
+
+    8.  Makefile   
+
+    9.  README 
+
+    10.  redis 
+
+        1. redis数据库文件的存储路径
+
+    11.  src_cgi 
+
+    12.    test
+
+    ​    
 
 ## 复习
 

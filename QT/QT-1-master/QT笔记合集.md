@@ -238,7 +238,7 @@ int main(int argc, char *argv[])  //argc为参数的个数，argv为参数的数
 
     w.show();
 
-    return a.exec();  //相当于函数返回并且执行一个a进程
+    return a.exec();  //相当于函数返回并且执行一个a进程  进入消息循环机制，根据消息类型来进行相应的处理
 
 }
 
@@ -250,13 +250,15 @@ int main(int argc, char *argv[])  //argc为参数的个数，argv为参数的数
 >
 > l  Qt一个类对应一个头文件，类名就是头文件名
 >
-> l  QApplication应用程序类
+> l 应用程序类
 >
 > n  管理图形用户界面应用程序的控制流和主要设置。
 >
 > n  是Qt的整个后台管理的命脉它**包含主事件循环**，在其中来自窗口系统和其它资源的**所有事件处理和调度**。它也处理**应用程序的初始化和结束**，并且**提供对话管理**。
 >
 > n  对于任何一个使用Qt的图形用户界面应用程序，都正好存在一个QApplication 对象，而不论这个应用程序在同一时间内是不是有0、1、2或更多个窗口。
+>
+>   qApp是 QApplication的指针，全局可用
 >
 > l  a.exec()
 >
@@ -526,9 +528,9 @@ int main(int argc, char *argv[])
 >   
 >   ```
 >   QObject::connect(&newspaper, static_cast<void (Newspaper:: *)
->         
+>             
 >   (const QString &)>(&Newspaper::newPaper),=](const QString &name) 
->         
+>             
 >   { /* Your code here. */ });
 >   ```
 >   
@@ -844,6 +846,8 @@ void removeWidget(QWidget * widget)
 >
 > - 与此相反的是非模态对话框，例如查找对话框，我们可以在显示着查找对话框的同时，继续对记事本的内容进行编辑。使用show执行
 
+==使用对话框一般是其静态成员函数==
+
 ### 4.5.2 标准对话框
 
 ​	所谓标准对话框，是 Qt 内置的一系列对话框，用于简化开发。事实上，有很多对话框都是通用的，比如打开文件、设置颜色、打印设置等。这些对话框在所有程序中几乎相同，因此没有必要在每一个程序中都自己实现这么一个对话框。
@@ -1065,7 +1069,9 @@ textEdit = new QTextEdit(this);
 setCentralWidget(textEdit);
 ```
 
-​	我们在菜单和工具栏添加了两个动作：打开和保存。接下来是一个QTextEdit类，这个类用于显示富文本文件。也就是说，它不仅仅用于显示文本，还可以显示图片、表格等等。不过，我们现在只用它显示纯文本文件。QMainWindow有一个setCentralWidget()函数，可以将一个组件作为窗口的中心组件，放在窗口中央显示区。显然，在一个文本编辑器中，文本编辑区就是这个中心组件，因此我们将QTextEdit作为这种组件。
+​	我们在菜单和工具栏添加了两个动作：打开和保存。接下来是一个QTextEdit类，==这个类用于显示富文本文件。也就是说，它不仅仅用于显示文本，还可以显示图片、表格，网页==等等。不过，我们现在只用它显示纯文本文件。QMainWindow有一个setCentralWidget()函数，可以将一个组件作为窗口的中心组件，放在窗口中央显示区。显然，在一个文本编辑器中，文本编辑区就是这个中心组件，因此我们将QTextEdit作为这种组件。
+
+==plaintdit只能显示纯文本==
 
 我们使用connect()函数，为这两个QAction对象添加响应的动作：
 
@@ -1163,6 +1169,8 @@ QString getOpenFileName(QWidget * parent = 0, const QString & caption = QString(
 >
 > ​	在saveFile()中使用的QFileDialog::getSaveFileName()也是类似的。使用这种静态函数，在 Windows、Mac OS 上面都是直接调用本地对话框，但是 Linux 上则是QFileDialog自己的模拟。这暗示了，如果你不使用这些静态函数，而是直接使用QFileDialog进行设置，那么得到的对话框很可能与系统对话框的外观不一致。这一点是需要注意的。
 >
+
+QMessageBox::warning(this, tr("Path"), tr("You did not select any file."));中，==tr函数返回值为qstring，将char*转化为qstring，同时其为utf-8编码，用于国际化==
 
 ## 4.6 常用控件
 
@@ -1331,7 +1339,58 @@ QCompleter类的setCaseSensitivity()函数可以设置是否区分大小写，�
 
 ### 4.6.3 其他控件
 
-Qt中控件的使用方法可参考Qt提供的帮助文档。
+#### QListView和QListWidget
+
+QListView基于mvc结构，视图和模型分离，视图仅显示，具体数据保存在模型中，通过控制器对界面进行更改，将操作转化为对模型数据的修改
+
+QListView 里没有自己的"模型"要自己建模来保存数据,这可以很大程度上降低数据冗余,提高程序的效率.但是要求我们对view/model框架比较了解,不适合新手使用.
+QListWidget是QListView的子类,在QListWidget中已经帮我们定义好了一个模型.这个模型非常方便,十分全面.这样就可以直接在QListWidget里面添加数据,而不用在从新制定一个模型了.十分方便.
+
+其实QListView和QListWidget的主要区别就是有木有自己的模型而已.
+
+另外：
+
+ 在很多情况下，只需要把一小部分的项呈现给用户，这就没必要使用model这样重量级的组件。Qt为了方便起见也提供了一些方便的项视图类，分别是QListWidget，QTableWidget和QTreeWidget，使用这些类可以直接对item进行操作。这种实现很像Qt早期版本，组件中包含了相应的item，例如QTableWidget中包含有QTableWidgetItem等。但是对于很大的数据，我们则需要使用Qt的view类，比如QListView，QTabelView和QTreeView，同时需要提供一个model，可以是自定义model，也可以是Qt预置的model。例如，如果数据来自数据库，那么你可以使用QTabelView和QSqlTableModel这两个类。
+
+(1)
+
+```
+ listWidget \= new QListWidget;
+
+ listWidget\->setIconSize(QSize(80, 60));
+
+ QMapIterator<int, QString\> i(symbolMap);
+
+ while (i.hasNext()) {
+
+ i.next();
+
+ QListWidgetItem \*item \= new QListWidgetItem(i.value(),listWidget);
+
+ item->setIcon(iconForSymbol(i.value()));
+
+ item->setData(Qt::UserRole, i.key());//给Qt::UserRole这个角色添加值
+```
+
+ }
+
+(2)
+
+```
+ QStringList leaders;
+
+ leaders << "Stooge Viller" << "Littleface" << "B-B Eyes"
+
+ model \= new QStringListModel(this);//使用的是预定义QStringListModel模型,当然也自定义（不是这里的重点）
+
+ model\->setStringList(leaders);
+
+ listView \= new QListView;
+
+ listView\->setModel(model);
+```
+
+
 
 ## 4.7 布局管理器
 
@@ -2244,6 +2303,8 @@ void PaintWidget::paintEvent(QPaintEvent *)
 ​	 **我们通常会将文件路径作为参数传给QFile的构造函数。不过也可以在创建好对象最后，使用setFileName()来修改**。QFile需要使用 / 作为文件分隔符，不过，它会自动将其转换成操作系统所需要的形式。例如 C:/windows 这样的路径在 Windows 平台下同样是可以的。
 
 ​	QFile主要提供了有关文件的各种操作，比如打开文件、关闭文件、刷新文件等。**我们可以使用QDataStream或QTextStream类来读写文件，也可以使用QIODevice类提供的read()、readLine()、readAll()以及write()这样的函数。**值得注意的是，**有关文件本身的信息，比如文件名、文件所在目录的名字等，则是通过QFileInfo获取**，而不是自己分析文件路径字符串。
+
+==读出来的文件在QT中都是以utf-8进行编码==
 
 下面我们使用一段代码来看看QFile的有关操作：
 

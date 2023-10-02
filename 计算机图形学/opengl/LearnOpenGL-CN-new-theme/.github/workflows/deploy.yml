@@ -1,0 +1,34 @@
+name: deploy
+on:
+  push:
+    branches: ['new-theme']
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: set up python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: install dependencies
+      shell: bash
+      run: |
+        pip install mkdocs==1.4.2 python-markdown-math==0.8
+    - name: build site
+      shell: bash
+      run: mkdocs build --clean
+    - name: deploy
+      shell: bash
+      env:
+        GH_NAME: ${{ secrets.GH_NAME }}
+        GH_EMAIL: ${{ secrets.GH_EMAIL }}
+        API_TOKEN: ${{ secrets.API_TOKEN }}
+      run: |
+        cd site
+        touch .nojekyll
+        git init
+        git add .
+        git -c user.name=$GH_NAME -c user.email=$GH_EMAIL commit -m "Auto Deployment"
+        git push -f -q "https://learnopengl-bot:$API_TOKEN@github.com/LearnOpenGL-CN/learnopengl-cn.github.io" master
+
