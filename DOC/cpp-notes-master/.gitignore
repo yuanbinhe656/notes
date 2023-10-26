@@ -1,0 +1,26 @@
+# IntelliJ project files
+.idea/
+*.iml
+*.ipr
+*.iws
+out
+gem
+
+# yarn
+package-lock.json
+yarn.lock
+yarn-error.log
+
+# VS Code project files
+.vscode/
+
+# MacOS files
+.DS_Store
+Thumbs.db
+
+# Node files
+node_modules/
+docs/
+md/about/me/about-todolist.md
+.vuepress/public/_images/images/
+.vuepress/components/

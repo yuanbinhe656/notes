@@ -116,7 +116,7 @@ SQL（Structured Query Language）是“结构化查询语言”，它是对关�
 
 #### 2、分类
 * DDL（Data Definition Language）：数据定义语言，用来定义数据库对象：库、表、列等；
-* DML（Data Manipulation Language）：数据操作语言，用来定义数据库记录（数据）；
+* DML（Data Manipulation Language）：数据操作语言，用来定义数据库记录（数据）； 
 * DCL（Data Control Language）：数据控制语言，用来定义访问权限和安全级别；
 * DQL（Data Query Language）：数据查询语言，用来查询记录（数据）。
 
