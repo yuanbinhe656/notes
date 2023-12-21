@@ -1,0 +1,16 @@
+GET /search/acjson?tn=resultjson_com&logid=9845949554919801479&ipn=rj&ct=201326592&is=&fp=result&fr=&word=%E6%B1%BD%E8%BD%A6&queryWord=%E6%B1%BD%E8%BD%A6&cl=2&lm=-1&ie=utf-8&oe=utf-8&adpicid=&st=-1&z=&ic=0&hd=&latest=&copyright=&s=&se=&tab=&width=&height=&face=0&istype=2&qc=&nc=1&expermode=&nojc=&isAsync=&pn=60&rn=30&gsm=3c&1699953354518= HTTP/1.1
+Accept: text/plain, */*; q=0.01
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9
+Connection: keep-alive
+Cookie: BAIDUID_BFESS=813FDEDB6A15A733C3C341132CE2994A:FG=1; BIDUPSID=813FDEDB6A15A733C3C341132CE2994A; PSTM=1683286335; ZFY=g8ItY4f8wcbZKXc8JOyMuFzJ23eVEts5i3:AMloOg1Hk:C; BDRCVFR[X_XKQks0S63]=mk3SLVN4HKm; userFrom=null; firstShowTip=1; indexPageSugList=%5B%22%E6%B1%BD%E8%BD%A6%22%2C%2222%22%5D; cleanHistoryStatus=0; BDRCVFR[dG2JNJb_ajR]=mk3SLVN4HKm; BDRCVFR[-pGxjrCMryR]=mk3SLVN4HKm; ab_sr=1.0.1_NmQ0YmViNzVmMDk0NDFjMDllNjFjMzI4YjY4NmI3YTEyZjUxZTc3ODg0ZGFjYWZmYmM1MGE5YjJkZGQ3ZDBhYzZiYjk5NzVlZWE1NWI3NGUwNzE0NmQxNzVmMTYxYjc1ZWFmZjE2NTJiMTNhYzBjNTVhZWJiNjUyNmY3OTYyZjE2NTIxNTc0NWY2ZGMwNzYxYTNjM2UyNDg3YWEzMjc2NA==
+Host: image.baidu.com
+Referer: https://image.baidu.com/search/index?tn=baiduimage&ipn=r&ct=201326592&cl=2&lm=-1&st=-1&fm=index&fr=&hs=0&xthttps=111110&sf=1&fmq=&pv=&ic=0&nc=1&z=&se=1&showtab=0&fb=0&width=&height=&face=0&istype=2&ie=utf-8&word=%E6%B1%BD%E8%BD%A6&oq=%E6%B1%BD%E8%BD%A6&rsp=-1
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+X-Requested-With: XMLHttpRequest
+sec-ch-ua: "Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
