@@ -1,3 +1,0 @@
-/mnt/e/BaiduSyncdisk/笔记/计算机/c++/cmake/code/test1/bulid/CMakeFiles/app.dir
-/mnt/e/BaiduSyncdisk/笔记/计算机/c++/cmake/code/test1/bulid/CMakeFiles/edit_cache.dir
-/mnt/e/BaiduSyncdisk/笔记/计算机/c++/cmake/code/test1/bulid/CMakeFiles/rebuild_cache.dir
