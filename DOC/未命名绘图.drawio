@@ -1,9 +1,72 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0" version="25.0.3">
   <diagram name="第 1 页" id="GAyrLSol1Q3GHH-3OnWV">
-    <mxGraphModel>
+    <mxGraphModel dx="1379" dy="791" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="p_8_d7TKpOltRARbijSC-2" value="银联" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
+          <mxGeometry x="540" y="60" width="100" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-3" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="p_8_d7TKpOltRARbijSC-2">
+          <mxGeometry x="45" y="125" width="10" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-4" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="p_8_d7TKpOltRARbijSC-2">
+          <mxGeometry x="50" y="250" width="10" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-5" value="完成退款" style="html=1;align=left;spacingLeft=2;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;curved=0;rounded=0;" edge="1" parent="p_8_d7TKpOltRARbijSC-2" target="p_8_d7TKpOltRARbijSC-4">
+          <mxGeometry x="-0.7295" y="20" relative="1" as="geometry">
+            <mxPoint x="49.66666666666674" y="230" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="110" y="230" />
+              <mxPoint x="110" y="270" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-6" value="DK" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
+          <mxGeometry x="180" y="60" width="100" height="410" as="geometry" />
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-7" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="p_8_d7TKpOltRARbijSC-6">
+          <mxGeometry x="45" y="90" width="10" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-8" value="" style="html=1;align=left;spacingLeft=2;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;curved=0;rounded=0;" edge="1" parent="p_8_d7TKpOltRARbijSC-6" target="p_8_d7TKpOltRARbijSC-7">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="50" y="70" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="80" y="100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-9" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="p_8_d7TKpOltRARbijSC-6">
+          <mxGeometry x="45" y="260" width="10" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-10" value="" style="shape=umlDestroy;whiteSpace=wrap;html=1;strokeWidth=3;targetShapes=umlLifeline;strokeColor=#f50a0a;" vertex="1" parent="p_8_d7TKpOltRARbijSC-6">
+          <mxGeometry x="35" y="250" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-11" value="请求退款" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;entryX=0;entryY=0;entryDx=0;entryDy=5;" edge="1" parent="1" source="p_8_d7TKpOltRARbijSC-7" target="p_8_d7TKpOltRARbijSC-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="190" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-12" value="返回退款状态（处理中）" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;curved=0;rounded=0;exitX=0;exitY=1;exitDx=0;exitDy=-5;" edge="1" parent="1" source="p_8_d7TKpOltRARbijSC-3" target="p_8_d7TKpOltRARbijSC-7">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="410" y="265" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-13" value="根据请求退款的回调进行通知退款结果" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;entryX=1;entryY=0;entryDx=0;entryDy=5;" edge="1" parent="1" target="p_8_d7TKpOltRARbijSC-9">
+          <mxGeometry x="0.0014" relative="1" as="geometry">
+            <mxPoint x="589.5000000000002" y="325" as="sourcePoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-14" value="" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;curved=0;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=-5;" edge="1" parent="1" source="p_8_d7TKpOltRARbijSC-9" target="p_8_d7TKpOltRARbijSC-4">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="610" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p_8_d7TKpOltRARbijSC-15" value="假如dk没有收到银联的扣除成功回调，&lt;span style=&quot;background-color: initial;&quot;&gt;并且又无法查询退款状态，则是否退款对dk来说是未知的&lt;/span&gt;&lt;div&gt;这个时候假如用户来反馈退款未到账，dk是无法判断用户反馈的内容是否真实&lt;/div&gt;&lt;div&gt;如果银联客户端可以判断订单是否可以退款成功的话，则可处理这种情况。&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="160" y="490" width="660" height="70" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
